@@ -43,7 +43,7 @@ class Agent:
         probs = self.pi(state)
         # 取出概率分布
         probs = probs[0]
-        # 下面两行根据动作的分布采样出一个动作
+        # 下面两行根据动作的分布采样出一个动作，创建了一个“按概率抽签”的分布对象
         m = Categorical(probs)
         action = m.sample().item()
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     #在倒立摆环境中训练智能体
     env = gym.make("CartPole-v1", render_mode="rgb_array")
     agent = Agent()
-    episodes = 1000
+    episodes = 4000
     rewards_history = []
     for episode in range(episodes):
         #重置环境，获取初始状态
