@@ -5,6 +5,8 @@ from torch import nn, optim
 from torch.distributions import Categorical
 import torch.nn.functional as F
 
+
+
 # -------------------- 1. 定义 Actor-Critic 网络 --------------------
 class ActorCritic(nn.Module):
     def __init__(self, state_dim, action_dim,hidden_size=64):
@@ -31,10 +33,6 @@ class ActorCritic(nn.Module):
         probs = self.actor(state)
         value = self.critic(state)
         return probs,value
-
-
-
-
 
 
 class Agent:
@@ -95,6 +93,8 @@ class Agent:
         returns = advantages + values
         return advantages, returns
 
+#-------------------- 3. PPO 更新函数 --------------------
+
     def update(self, states, actions, old_log_probs, returns, advantages):
         """单次 PPO 更新（在一个 mini-batch 上）"""
         states = torch.tensor(states, dtype=torch.float32, device=self.device)
@@ -129,10 +129,11 @@ class Agent:
 
         return loss.item()
 
-    # -------------------- 3. 主训练循环（示例） --------------------
+    # -------------------- 4. 主训练循环 --------------------
     def train_ppo(self, env, num_episodes=1000, rollout_steps=500, ppo_epochs=10, mini_batch_size=64):
         """主训练循环"""
         total_steps = 0
+        rewards_history = []
         for episode in range(num_episodes):
             state, _ = env.reset()
             # 存储轨迹数据
@@ -201,9 +202,13 @@ class Agent:
                                 batch_returns, batch_advantages)
 
             print(f"Episode {episode}, Reward: {episode_reward:.2f}")
+            rewards_history.append(episode_reward)
+
 
         # 保存模型
         torch.save(self.actorcritic.state_dict(), "models/actorcritic_model.pth")
+
+        return rewards_history
 
 
 
@@ -211,4 +216,12 @@ if __name__ == "__main__":
 
     env = gym.make("CartPole-v1")
     agent = Agent(state_dim=4, action_dim=2, lr=3e-4)
-    agent.train_ppo(env, num_episodes=500, rollout_steps=500, ppo_epochs=10, mini_batch_size=64)
+    reward = agent.train_ppo(env, num_episodes=50, rollout_steps=500, ppo_epochs=10, mini_batch_size=64)
+    import matplotlib.pyplot as plt
+    # 训练结束后绘制奖励变化图
+    plt.plot(reward)
+    plt.xlabel('回合')
+    plt.ylabel('总奖励')
+    plt.title('每回合奖励')
+    plt.grid(True)
+    plt.show()
