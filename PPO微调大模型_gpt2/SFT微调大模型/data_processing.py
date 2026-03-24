@@ -35,6 +35,9 @@ def preprocess_data(data_path,data_output_path):
     # 调整列顺序为 idx, context, label
     df = df[['idx', 'context', 'label']]
 
+    # 去掉文本中的所有空格
+    df['context'] = df['context'].str.replace(' ', '', regex=False)
+
     # 保存为 JSONL 格式
     df.to_json(data_output_path, orient='records', lines=True, force_ascii=False)
 
@@ -104,12 +107,12 @@ def load_data(data_path,tokenizer):
 if __name__ == "__main__":
     data_path = ["data_raw/train.txt","data_raw/valid.txt","data_raw/test.txt"]
     data_output_path = ["data_raw/train.jsonl","data_raw/valid.jsonl","data_raw/test.jsonl"]
-    # for i in range(3):
-    #     preprocess_data(data_path[i],data_output_path[i])
+    for i in range(3):
+        preprocess_data(data_path[i],data_output_path[i])
     # load_data('data_raw/test.jsonl')
-    from modelscope import GPT2Tokenizer, GPT2LMHeadModel
-    hf_model_path = 'Fengshenbang/Wenzhong-GPT2-110M-chinese-v2'
-    tokenizer = GPT2Tokenizer.from_pretrained(hf_model_path)
-    dataset = load_data(data_output_path,tokenizer)
+    # from modelscope import GPT2Tokenizer, GPT2LMHeadModel
+    # hf_model_path = 'Fengshenbang/Wenzhong-GPT2-110M-chinese-v2'
+    # tokenizer = GPT2Tokenizer.from_pretrained(hf_model_path)
+    # dataset = load_data(data_output_path,tokenizer)
 
 
