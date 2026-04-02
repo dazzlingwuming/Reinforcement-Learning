@@ -57,7 +57,7 @@ def chat_loop(model, tokenizer, device):
                 model_inputs.input_ids,
                 attention_mask=model_inputs.attention_mask,
                 max_new_tokens=MAX_NEW_TOKENS,
-                do_sample=False,
+                do_sample=True,
                 eos_token_id=model.generation_config.eos_token_id,
                 pad_token_id=model.generation_config.pad_token_id,
                 repetition_penalty=model.generation_config.repetition_penalty,
@@ -77,7 +77,7 @@ def chat_loop(model, tokenizer, device):
 
         #测试两轮对话后退出
         i += 1
-        if i >= 2:
+        if i >= 10:
             print("测试完成，退出。")
             break
 
@@ -85,7 +85,7 @@ def chat_loop(model, tokenizer, device):
 def t1():
     print("测试LoRA适配器...")
     device = "cuda"
-    adapter_path = Path(__file__).resolve().parent / "models" / "Qwen2.5-0.5B-SFT"
+    adapter_path = Path(__file__).resolve().parent / "models" / "Qwen2.5-0.5B-SFT-falsesample-r16"
     adapter_config_path = adapter_path / "adapter_config.json"
 
     with adapter_config_path.open("r", encoding="utf-8") as f:
@@ -150,5 +150,5 @@ def t3():
 
 if __name__ == "__main__":
     t1()  # LoRA adapter
-    t2()  # merged model
-    t3()  # base model
+    # t2()  # merged model
+    # t3()  # base model
